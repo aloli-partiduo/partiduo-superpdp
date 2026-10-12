@@ -1,5 +1,5 @@
 name: partiduo-superpdp
-version: 0.1.0
+version: 0.1.1
 
 description: |
   Extension SUPERPDP de Partiduo : adaptateur de la plateforme agréée
@@ -30,7 +30,7 @@ dependencies:
   partiduo-einvoicing:
     path: ../partiduo-einvoicing
   marten:
-    path: ../../marten
+    path: ../../prod-crystal/marten
 
 development_dependencies:
   # L'interface qui monte ui/bulma/ : nécessaire aux specs et à manage.cr ;
