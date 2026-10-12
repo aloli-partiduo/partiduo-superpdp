@@ -15,7 +15,7 @@
 Partiduo::Modules.register do
   code "SUPERPDP"
   name "superpdp.module.name"
-  version "0.1.0"
+  version Superpdp::VERSION
   requires_core "~> 0.1"
   depends_on "EINV"
 
