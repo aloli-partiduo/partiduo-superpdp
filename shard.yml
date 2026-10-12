@@ -1,5 +1,5 @@
 name: partiduo-superpdp
-version: 0.1.1
+version: 0.1.2
 
 description: |
   Extension SUPERPDP de Partiduo : adaptateur de la plateforme agréée
@@ -22,21 +22,26 @@ targets:
 dependencies:
   # Le cœur : registre, contrat Partiduo::Api.
   partiduo:
-    path: ../partiduo-app
+    github: aloli-partiduo/partiduo-app
+    branch: development
   # La boîte « Justificatifs à traiter », dont EINV dépend.
   partiduo-document:
-    path: ../partiduo-document
+    github: aloli-partiduo/partiduo-document
+    branch: development
   # L'extension EINV : connecteur abstrait Einvoicing::Connector.
   partiduo-einvoicing:
-    path: ../partiduo-einvoicing
+    github: aloli-partiduo/partiduo-einvoicing
+    branch: development
   marten:
-    path: ../../prod-crystal/marten
+    github: aloli-crystal/marten
+    branch: production
 
 development_dependencies:
   # L'interface qui monte ui/bulma/ : nécessaire aux specs et à manage.cr ;
   # la distribution l'apporte elle-même.
   partiduo-ui-bulma:
-    path: ../partiduo-ui-bulma
+    github: aloli-partiduo/partiduo-ui-bulma
+    branch: development
   ameba:
     github: crystal-ameba/ameba
     version: "~> 1.6"
