@@ -29,6 +29,8 @@ require "../lib/partiduo-ui-bulma/spec/support/accounts"
 require "../lib/partiduo-ui-bulma/spec/support/browser"
 require "../lib/partiduo-ui-bulma/spec/support/reference"
 require "../lib/partiduo-ui-bulma/spec/support/books"
+# Contrôle des traductions (fichiers de locales, clés citées, pages rendues).
+require "../lib/partiduo-ui-bulma/spec/support/translations"
 # Dossier, factures émises et reçues d'exemple d'EINV (sa plateforme
 # simulée XP Z12-013 est remplacée ici par SUPER PDP simulée).
 require "../lib/partiduo-einvoicing/spec/support/platform"
