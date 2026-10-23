@@ -1,0 +1,64 @@
+it:
+  superpdp:
+    module:
+      name: "SUPER PDP (piattaforma accreditata)"
+    permissions:
+      connection:
+        manage: "Collegare la piattaforma accreditata SUPER PDP"
+    menu:
+      superpdp: "SUPER PDP"
+    adapter: "SUPER PDP (API JSON, Francia e Belgio)"
+    modes:
+      sandbox: "Ambiente di prova"
+      production: "Produzione"
+    auth_modes:
+      client_credentials: "Credenziali di un'applicazione della società (client credentials)"
+      authorization_code: "Autorizzazione tramite l'account SUPER PDP (authorization code)"
+    schemes:
+      fr_siren: "SIREN (Francia)"
+      be_numero_entreprise: "Numero d'impresa (Belgio)"
+      sandbox: "Numero fittizio (ambiente di prova)"
+    vat_regimes:
+      monthly: "Réel normal, mensile (regime ordinario)"
+      quarterly: "Réel normal, trimestrale (regime ordinario)"
+      simplified: "Régime simplifié (regime semplificato)"
+      vat_exemption: "Franchise en base (franchigia IVA)"
+    verification:
+      verified: "Impresa verificata"
+      needs_review: "Verifica in corso da parte di SUPER PDP"
+      failed: "Verifica rifiutata da SUPER PDP"
+    address_kinds:
+      SIREN: "SIREN"
+      SIREN_SIRET: "SIREN e SIRET"
+      SIREN_SUFFIXE: "SIREN e suffisso"
+      SIREN_SIRET_CODEROUTAGE: "SIREN, SIRET e codice di instradamento"
+    errors:
+      transport:
+        api: "SUPER PDP ha risposto %{status}: %{detail}"
+        no_token: "Token SUPER PDP non ottenuto."
+        no_authorization: "Nessuna autorizzazione SUPER PDP: colleghi la piattaforma."
+        refused: "Autorizzazione SUPER PDP rifiutata (%{status}): %{detail}"
+        unauthorized: "SUPER PDP nega l'accesso (401): colleghi di nuovo la piattaforma."
+        no_vat_summary: "Fattura SUPER PDP senza riepilogo IVA."
+        unknown_invoice: "Fattura sconosciuta a SUPER PDP."
+        no_ereporting: "E-reporting %{kind} non offerto da SUPER PDP."
+      credentials:
+        blank: "Questo campo è obbligatorio."
+        too_long: "Al massimo %{max} caratteri."
+        refused: "SUPER PDP rifiuta queste credenziali."
+      connection:
+        failed: "SUPER PDP non risponde come previsto: %{detail}"
+        missing: "SUPER PDP non è collegato."
+        not_verified: "L'impresa non è ancora verificata da SUPER PDP (%{status})."
+        authorization: "L'autorizzazione SUPER PDP non è più valida, colleghi di nuovo la piattaforma: %{detail}"
+      authorization:
+        unavailable: "Il collegamento tramite l'account SUPER PDP non è configurato su questa istanza."
+        redirect_uri: "Indirizzo di ritorno non ammesso (atteso HTTPS)."
+        login_hint: "Indirizzo e-mail non valido."
+        company_number: "Numero d'impresa non valido per questo schema: %{value}."
+        state: "Ritorno di autorizzazione sconosciuto, scaduto o già usato: ricominci il collegamento."
+        denied: "SUPER PDP non ha concesso l'autorizzazione: %{detail}"
+        code: "Ritorno di autorizzazione senza codice."
+        exchange: "Non è stato possibile scambiare il codice di autorizzazione: %{detail}"
+      vat_regime:
+        invalid: "Regime IVA sconosciuto: %{value}."

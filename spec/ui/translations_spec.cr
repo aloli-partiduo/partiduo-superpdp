@@ -4,16 +4,17 @@ require "../spec_helper"
 
 # Traductions des écrans de l'extension (ADR-005 D7) : chaque route de
 # `/ext/SUPERPDP/` servie en `GET` (liste tirée du routeur de Marten),
-# obtenue en fr, en et nl par un administrateur, SUPER PDP d'abord non
-# raccordé (application d'opérateur présente : les deux modes de
-# raccordement), puis raccordé (lignes d'annuaire, régime de TVA). Contrôle
-# de l'interface (`PartiduoUi::Translations`) : ni marqueur de traduction
-# absente, ni clé brute, ni interpolation non résolue, et toute route
-# atteinte par les liens des pages.
+# obtenue dans chaque langue de l'interface (`Partiduo::LOCALES`) par un
+# administrateur, SUPER PDP d'abord non raccordé (application d'opérateur
+# présente : les deux modes de raccordement), puis raccordé (lignes
+# d'annuaire, régime de TVA). Contrôle de l'interface
+# (`PartiduoUi::Translations`) : ni marqueur de traduction absente, ni clé
+# brute, ni interpolation non résolue, et toute route atteinte par les
+# liens des pages.
 
 private alias S = Superpdp::SpecSupport
 
-describe "Traductions des écrans SUPER PDP (fr, en, nl)" do
+describe "Traductions des écrans SUPER PDP (chaque langue de l'interface)" do
   it "rend chaque écran dans chaque langue, sans clé absente, brute ni interpolation non résolue" do
     S.books
     browser = PartiduoUi::Accounts.signed_in
@@ -31,7 +32,7 @@ describe "Traductions des écrans SUPER PDP (fr, en, nl)" do
     puts "\nTraductions de SUPERPDP : #{explorer.report}"
     (explorer.failures + explorer.unreached.map { |route| "route jamais atteinte : #{route}" }).should eq([] of String)
   ensure
-    # L'exploration laisse active la dernière langue demandée (nl) : les
+    # L'exploration laisse active la dernière langue demandée : les
     # exemples suivants attendent la langue par défaut.
     I18n.activate(Marten.settings.i18n.default_locale)
   end

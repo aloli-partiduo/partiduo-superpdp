@@ -1,0 +1,64 @@
+de:
+  superpdp:
+    module:
+      name: "SUPER PDP (zugelassene Plattform)"
+    permissions:
+      connection:
+        manage: "Zugelassene Plattform SUPER PDP anbinden"
+    menu:
+      superpdp: "SUPER PDP"
+    adapter: "SUPER PDP (JSON-API, Frankreich und Belgien)"
+    modes:
+      sandbox: "Sandbox"
+      production: "Produktion"
+    auth_modes:
+      client_credentials: "Zugangsdaten einer Anwendung des Unternehmens (client credentials)"
+      authorization_code: "Autorisierung über das SUPER-PDP-Konto (authorization code)"
+    schemes:
+      fr_siren: "SIREN (Frankreich)"
+      be_numero_entreprise: "Unternehmensnummer (Belgien)"
+      sandbox: "Fiktive Nummer (Sandbox)"
+    vat_regimes:
+      monthly: "Réel normal, monatlich (Regelbesteuerung)"
+      quarterly: "Réel normal, vierteljährlich (Regelbesteuerung)"
+      simplified: "Régime simplifié (vereinfachtes Verfahren)"
+      vat_exemption: "Franchise en base (Kleinunternehmerregelung)"
+    verification:
+      verified: "Unternehmen verifiziert"
+      needs_review: "Verifizierung durch SUPER PDP läuft"
+      failed: "Verifizierung von SUPER PDP abgelehnt"
+    address_kinds:
+      SIREN: "SIREN"
+      SIREN_SIRET: "SIREN und SIRET"
+      SIREN_SUFFIXE: "SIREN und Suffix"
+      SIREN_SIRET_CODEROUTAGE: "SIREN, SIRET und Routingcode"
+    errors:
+      transport:
+        api: "SUPER PDP hat mit %{status} geantwortet: %{detail}"
+        no_token: "SUPER-PDP-Token nicht erhalten."
+        no_authorization: "Keine SUPER-PDP-Autorisierung: Binden Sie die Plattform an."
+        refused: "SUPER-PDP-Autorisierung abgelehnt (%{status}): %{detail}"
+        unauthorized: "SUPER PDP verweigert den Zugriff (401): Binden Sie die Plattform erneut an."
+        no_vat_summary: "SUPER-PDP-Rechnung ohne USt.-Aufstellung."
+        unknown_invoice: "Rechnung bei SUPER PDP unbekannt."
+        no_ereporting: "E-Reporting %{kind} wird von SUPER PDP nicht angeboten."
+      credentials:
+        blank: "Dieses Feld ist erforderlich."
+        too_long: "Höchstens %{max} Zeichen."
+        refused: "SUPER PDP lehnt diese Zugangsdaten ab."
+      connection:
+        failed: "SUPER PDP antwortet nicht wie erwartet: %{detail}"
+        missing: "SUPER PDP ist nicht angebunden."
+        not_verified: "Das Unternehmen ist von SUPER PDP noch nicht verifiziert (%{status})."
+        authorization: "Die SUPER-PDP-Autorisierung ist nicht mehr gültig, binden Sie die Plattform erneut an: %{detail}"
+      authorization:
+        unavailable: "Die Anbindung über das SUPER-PDP-Konto ist auf dieser Instanz nicht konfiguriert."
+        redirect_uri: "Rücksprungadresse nicht zulässig (HTTPS erwartet)."
+        login_hint: "Ungültige E-Mail-Adresse."
+        company_number: "Ungültige Unternehmensnummer für dieses Schema: %{value}."
+        state: "Unbekannte, abgelaufene oder bereits verwendete Autorisierungsantwort: Beginnen Sie die Anbindung erneut."
+        denied: "SUPER PDP hat die Autorisierung nicht erteilt: %{detail}"
+        code: "Autorisierungsantwort ohne Code."
+        exchange: "Der Autorisierungscode konnte nicht eingetauscht werden: %{detail}"
+      vat_regime:
+        invalid: "Unbekanntes USt.-Regime: %{value}."

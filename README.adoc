@@ -104,7 +104,7 @@ src/superpdp/
 ├── models/, migrations/          # tables superpdp_*
 ├── services/                     # raccordement (interne)
 ├── api/                          # contrat public Superpdp::Api
-└── locales/                      # fr, en, nl
+└── locales/                      # fr, en, nl, de, es, it, pt
 ui/bulma/                         # interface Bulma (Superpdp::Ui), ADR-005 D4
 spec/support/superpdp_platform.cr # SUPER PDP simulée
 spec/integration/sandbox_spec.cr  # suite d'intégration contre le bac à sable réel
