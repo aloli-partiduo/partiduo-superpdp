@@ -12,12 +12,15 @@
 # * Menu : « SUPER PDP » sous « Paramètres », à côté du raccordement d'EINV.
 # * Aucun abonnement : émission, réception, statuts et e-reporting sont
 #   conduits par EINV, qui appelle l'adaptateur.
+# * Exclusion (D-AMD-042 du cœur) : jamais dans le dossier d'un foyer
+#   (`incompatible_with_kind "household"`), même sans PERSO, comme EINV.
 Partiduo::Modules.register do
   code "SUPERPDP"
   name "superpdp.module.name"
   version Superpdp::VERSION
   requires_core "~> 0.1"
   depends_on "EINV"
+  incompatible_with_kind "household"
 
   permission "superpdp.connection.manage"
 

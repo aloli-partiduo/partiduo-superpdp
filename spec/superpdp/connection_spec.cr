@@ -18,6 +18,7 @@ describe "Raccordement SUPER PDP : OAuth 2.1 en deux modes (ADR-004 D8)" do
                                                                                          {"client_secret", true, false}])
     manifest = Partiduo::Modules["SUPERPDP"]
     manifest.depends_on.should eq(["EINV"])
+    manifest.incompatible_with_kind.should eq(["household"])
     manifest.permissions.should eq(["superpdp.connection.manage"])
     manifest.menus.map { |menu| {menu.code, menu.parent, menu.route, menu.permission} }
       .should eq([{"SUPERPDP", "SETTINGS", "superpdp:index", "superpdp.connection.manage"}])
