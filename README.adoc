@@ -89,6 +89,28 @@ de la connexion (mode, entreprise, vérification, lignes d'annuaire,
 dernière synchronisation), régime de TVA, vérification, déconnexion.
 |===
 
+== Dossiers belges
+
+SUPER PDP envoie et reçoit les factures des entreprises belges par Peppol
+(documentation SUPER PDP, page « Belgique »,
+https://www.superpdp.tech/documentation/12[], vérifiée le 25 octobre 2026).
+L'extension reste donc ouverte aux dossiers de régime `be` (ADR-004 D8).
+Conditions propres à la Belgique :
+
+. *Souscription de l'éditeur.* Aloli souscrit l'offre Belgique par courriel
+  à SUPER PDP (objet « Souscription Belgique <entreprise> »), puis fait
+  vérifier l'identité de son responsable légal (KYC) et l'entreprise (KYB)
+  depuis son compte SUPER PDP.
+. *Raccordement en _authorization code_ seulement.* Chaque entreprise belge
+  passe par le parcours d'inscription SUPER PDP (KYC, KYB) puis revient sur
+  son instance avec le jeton délégué (`superpdp_company_number_scheme`
+  `be_numero_entreprise`). Le mode _client credentials_ ne sert pas aux
+  dossiers belges. Ce mode n'a pas encore été essayé contre SUPER PDP : il
+  faut d'abord déclarer l'application OAuth de l'opérateur (B-SPDP-004).
+. *Bac à sable.* L'inscription dans l'annuaire Peppol de test n'est pas
+  automatique : sur l'entreprise de test, « Nouvelle ligne d'annuaire… »
+  avec le schéma belge `0208`.
+
 == Organisation
 
 [source]
