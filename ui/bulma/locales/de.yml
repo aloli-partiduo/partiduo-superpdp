@@ -9,7 +9,7 @@ de:
       other_adapter: "Derzeit ist eine andere Plattform (%{adapter}) angebunden; die Anbindung an SUPER PDP ersetzt sie."
       mode: "Modus"
       mode_unconfirmed: "(durch eine Prüfung zu bestätigen)"
-      sandbox_note: "Sandbox: Die ausgetauschten Rechnungen sind fiktiv und gehen nicht an die Verwaltung."
+      sandbox_note: "Sandbox: Die ausgetauschten Rechnungen sind fiktiv und gehen nicht an die Finanzverwaltung."
       auth_mode: "Authentifizierung"
       company: "Unternehmen"
       verification: "Verifizierung"
