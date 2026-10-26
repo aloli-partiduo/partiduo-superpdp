@@ -7,9 +7,10 @@ require "../spec_helper"
 # existent : variables `SUPERPDP_SANDBOX_SELLER_CLIENT_ID`,
 # `SUPERPDP_SANDBOX_SELLER_CLIENT_SECRET` (émettrice),
 # `SUPERPDP_SANDBOX_BUYER_CLIENT_ID`, `SUPERPDP_SANDBOX_BUYER_CLIENT_SECRET`
-# (destinataire), lues dans l'environnement ou, à défaut, dans
-# `~/.config/partiduo/superpdp-sandbox.env` (lignes `VAR=valeur`, lues
-# comme le shell : commentaire final, guillemets).
+# (destinataire), lues dans l'environnement ou, à défaut, dans le fichier
+# `SUPERPDP_SANDBOX_ENV_FILE` (par défaut
+# `~/.config/partiduo/superpdp-sandbox.env`, lignes `VAR=valeur`, lues
+# comme le shell : commentaire final, guillemets ; `SandboxEnv`).
 # `SUPERPDP_SANDBOX=off` la désactive.
 #
 # Les secrets ne sont jamais affichés ni journalisés : les jetons restent en
@@ -20,26 +21,13 @@ module Superpdp
     module Sandbox
       VARS = %w[SUPERPDP_SANDBOX_SELLER_CLIENT_ID SUPERPDP_SANDBOX_SELLER_CLIENT_SECRET
         SUPERPDP_SANDBOX_BUYER_CLIENT_ID SUPERPDP_SANDBOX_BUYER_CLIENT_SECRET]
-      FILE = Path.home.join(".config", "partiduo", "superpdp-sandbox.env").to_s
 
       # Délai d'attente du traitement asynchrone de la plateforme.
       TIMEOUT = 90.seconds
 
       def self.credentials : Hash(String, String)?
         return if ENV["SUPERPDP_SANDBOX"]? == "off"
-        values = {} of String => String
-        if File.exists?(FILE)
-          File.each_line(FILE) do |line|
-            name, separator, value = line.strip.partition('=')
-            next if separator.empty? || name.starts_with?('#')
-            # Comme le shell : commentaire en fin de ligne après une espace,
-            # guillemets autour de la valeur.
-            value = value.sub(/\s+#.*\z/, "").strip
-            value = value[1..-2] if value.size >= 2 && value[0] == value[-1] && value[0].in?('"', '\'')
-            values[name.strip.lchop("export ").strip] = value
-          end
-        end
-        VARS.each { |name| ENV[name]?.presence.try { |value| values[name] = value } }
+        values = SandboxEnv.load(VARS)
         VARS.all? { |name| values[name]?.presence } ? values : nil
       end
 

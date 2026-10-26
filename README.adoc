@@ -20,7 +20,8 @@ La spécification est dans `../partiduo-docs/` : ADR-004 (facturation
 électronique, D2 à D9, en particulier D8), ADR-003 (contrat d'extension),
 ADR-005 D4 (interface d'une extension), ADR-006 D3 et D5. Les décisions
 propres à ce dépôt sont consignées dans `../partiduo-app/DECISIONS.adoc`
-(préfixe `D-SPDP-`), les blocages dans `../partiduo-app/BLOCAGES.adoc`
+(`D-SPDP-001` à `D-SPDP-014`), puis dans link:DECISIONS.adoc[] (à partir de
+`D-SPDP-015`) ; les blocages dans `../partiduo-app/BLOCAGES.adoc`
 (`B-SPDP-`). Référence du contrat : link:doc/api/superpdp.adoc[].
 
 == Fonctions
@@ -106,10 +107,162 @@ Conditions propres à la Belgique :
   son instance avec le jeton délégué (`superpdp_company_number_scheme`
   `be_numero_entreprise`). Le mode _client credentials_ ne sert pas aux
   dossiers belges. Ce mode n'a pas encore été essayé contre SUPER PDP : il
-  faut d'abord déclarer l'application OAuth de l'opérateur (B-SPDP-004).
+  faut d'abord déclarer l'application OAuth de l'opérateur (B-SPDP-004),
+  voir « Raccorder une entreprise par délégation OAuth » ci-dessous.
 . *Bac à sable.* L'inscription dans l'annuaire Peppol de test n'est pas
   automatique : sur l'entreprise de test, « Nouvelle ligne d'annuaire… »
   avec le schéma belge `0208`.
+
+== Raccorder une entreprise par délégation OAuth
+
+Préalable aux dossiers belges (ADR-004 D8, B-SPDP-004, D-SPDP-015). Le
+mode _authorization code_ demande une *application OAuth de l'opérateur*,
+déclarée dans le compte SUPER PDP de l'opérateur : c'est un geste sur ce
+compte, que Partiduo ne fait pas. Ce guide le décrit, puis l'essai de bout
+en bout en bac à sable, enfin la production.
+
+Pages de la documentation SUPER PDP suivies (lues le 26 octobre 2026) :
+
+* « Authentification », https://www.superpdp.tech/documentation/4[] :
+  _authorization code_ (`https://api.superpdp.tech/oauth2/authorize`,
+  `https://api.superpdp.tech/oauth2/token`), `client_id` et
+  `client_secret` « à récupérer dans l'interface SUPER PDP », *Redirect URL
+  identique à celle renseignée dans l'interface SUPER PDP*, aucun _scope_,
+  champs pré-remplis (`login_hint`, `superpdp_company_number` et
+  `superpdp_company_number_scheme` : `sandbox`, `fr_siren` ou
+  `be_numero_entreprise`), révocation RFC 7009, jeton d'accès de
+  30 minutes, jeton de rafraîchissement d'un an renouvelé à chaque usage ;
+* « Belgique », https://www.superpdp.tech/documentation/12[] :
+  souscription, vérifications KYC et KYB, application OAuth liée à
+  l'entreprise de production, bac à sable avec une entreprise et une
+  application « bac à sable », ligne d'annuaire belge à ajouter à la main ;
+* « Démarrage rapide », https://www.superpdp.tech/documentation/2[] :
+  compte, entreprises fictives *Burger Queen* et *Tricatel*, « Applications »
+  puis « Nouvelle application… », secret affiché une seule fois ;
+* « Annuaire », https://www.superpdp.tech/documentation/7[] : adresse
+  Peppol belge = schéma `0208` et numéro d'entreprise (BCE) ;
+* exemple de SUPER PDP, https://github.com/superpdp/examples/blob/main/erp.go[] :
+  serveur local avec la Redirect URL `http://localhost:8081/callback`, une
+  adresse locale en `http` est donc admise pour le bac à sable.
+
+=== 1. Application OAuth de l'opérateur, en bac à sable
+
+. Se connecter au compte SUPER PDP de l'opérateur
+  (https://www.superpdp.tech[], « Connexion »). Le compte contient les
+  entreprises bac à sable *Burger Queen* et *Tricatel*.
+. « Applications », puis « Nouvelle application… » : choisir l'entreprise
+  bac à sable *Burger Queen* et une application de délégation
+  (_authorization code_) si le formulaire demande le type.
+. *Redirect URL* (l'adresse de rappel), exactement :
++
+----
+http://localhost:8765/ext/SUPERPDP/oauth/callback
+----
++
+C'est la route de rappel de l'instance (`superpdp:callback`,
+`/ext/SUPERPDP/oauth/callback`, `ui/bulma/bulma.cr`), servie en local par
+l'essai sur le port 8765 (`SUPERPDP_SANDBOX_OAUTH_PORT` pour un autre
+port : déclarer alors ce port). L'essai affiche cette adresse s'il manque
+un identifiant.
+. Noter le `client_id` et le `client_secret` (affiché une seule fois) dans
+  le fichier du poste (étape 3).
+
+=== 2. Entreprise belge de test
+
+. « Applications », puis « Nouvelle application… » : entreprise bac à sable
+  *Tricatel*, application ordinaire (_client credentials_). Ses
+  identifiants sont ceux de l'acheteur de la suite d'intégration
+  (`SUPERPDP_SANDBOX_BUYER_…`) : la même application sert aux deux.
+. Cliquer sur *Tricatel*, puis « Nouvelle ligne d'annuaire… » : *Scheme
+  ID* belge `0208` et un numéro d'entreprise de dix chiffres valide modulo
+  97 (huit chiffres, puis 97 moins leur reste par 97 : `1234567894`, par
+  exemple). L'inscription dans l'annuaire Peppol de test n'est pas
+  automatique : sans cette ligne, l'essai s'arrête et le dit.
+. Dans le parcours de l'essai, autoriser *Burger Queen*, pas Tricatel :
+  l'entreprise raccordée envoie la facture, Tricatel la reçoit.
+
+=== 3. Identifiants sur le poste
+
+Fichier `~/.config/partiduo/superpdp-sandbox.env` (droits `600`, jamais
+versionné), lignes `VAR=valeur` ; l'environnement est prioritaire, et
+`SUPERPDP_SANDBOX_ENV_FILE` désigne un autre fichier :
+
+[source,sh]
+----
+# Application OAuth bac à sable de l'opérateur (étape 1)
+SUPERPDP_SANDBOX_OAUTH_CLIENT_ID=
+SUPERPDP_SANDBOX_OAUTH_CLIENT_SECRET=
+# Entreprise belge de test, Tricatel (étape 2)
+SUPERPDP_SANDBOX_BUYER_CLIENT_ID=
+SUPERPDP_SANDBOX_BUYER_CLIENT_SECRET=
+# Facultatives : port de la route de rappel locale (8765), courriel
+# pré-rempli dans le parcours SUPER PDP
+SUPERPDP_SANDBOX_OAUTH_PORT=
+SUPERPDP_SANDBOX_OAUTH_LOGIN_HINT=
+# Suite d'intégration (vendeur, Burger Queen en client credentials)
+SUPERPDP_SANDBOX_SELLER_CLIENT_ID=
+SUPERPDP_SANDBOX_SELLER_CLIENT_SECRET=
+----
+
+=== 4. Essai de bout en bout en bac à sable
+
+`spec/integration/oauth_sandbox_essai.cr` (nom sans `_spec` : jamais dans
+la suite) passe par le contrat de l'instance, comme l'écran « Se raccorder
+avec SUPER PDP » d'un dossier belge :
+
+. l'instance génère le lien d'autorisation (`state` haché à usage unique,
+  PKCE `S256`) ; l'essai l'affiche ;
+. vous l'ouvrez dans votre navigateur, ouvrez le compte, autorisez
+  *Burger Queen* ;
+. SUPER PDP vous renvoie sur la route de rappel, servie en local par
+  l'essai (15 minutes au plus) ;
+. l'instance échange le code (PKCE) contre les jetons et appelle
+  `GET /oauth2_sessions/me` et `GET /companies/me` : raccordée, en bac à
+  sable ;
+. l'entreprise raccordée envoie une facture UBL PEPPOL BIS
+  (`generate_test_invoice`, format `ubl-peppol-bis`) adressée en
+  `0208:<numéro>` ; Tricatel la reçoit (`GET /invoices?direction=in`).
+
+[source,sh]
+----
+createdb --encoding=UTF8 partiduo_test_oauth
+(cd ~/prod-partiduo/partiduo-superpdp && DATABASE_URL='postgres:///partiduo_test_oauth?host=/tmp' crystal spec --no-debug spec/integration/oauth_sandbox_essai.cr)
+dropdb partiduo_test_oauth
+----
+
+Sans identifiants, l'essai s'arrête aussitôt (exemple « en attente ») avec
+les variables manquantes et l'adresse de rappel à déclarer. Il passe par
+`HTTPS_PROXY` s'il est défini. Réussi, il lève B-SPDP-004 pour le bac à
+sable.
+
+=== 5. Production
+
+. Souscription Belgique et vérifications de l'entreprise de l'opérateur
+  (« Dossiers belges », point 1).
+. « Applications », puis « Nouvelle application… », liée à l'entreprise de
+  *production* ; Redirect URL : l'adresse de rappel de l'instance,
++
+----
+https://<hôte de l'instance>/ext/SUPERPDP/oauth/callback
+----
++
+construite par l'instance à partir de son hôte (`redirect_uri` de
+`Superpdp::Ui::Handler`), ou celle de `PARTIDUO_SUPERPDP_REDIRECT_URI`
+quand l'adresse enregistrée diffère. Hors `localhost`, elle est en
+`https` (`Linking.redirect_uri?`). SUPER PDP compare l'adresse à celle de
+l'application : chaque dossier ayant son propre hôte, déclarer l'adresse de
+chaque instance raccordée si le formulaire en admet plusieurs, sinon une
+application par instance (D-SPDP-015).
+. Réglages de l'instance (`src/superpdp/config.cr`), dans son fichier
+  d'environnement :
+** `PARTIDUO_SUPERPDP_OAUTH_CLIENT_ID`, `PARTIDUO_SUPERPDP_OAUTH_CLIENT_SECRET`
+   (les deux, sinon le mode n'est pas proposé) ;
+** `PARTIDUO_SUPERPDP_REDIRECT_URI` (facultatif, voir ci-dessus) ;
+** `PARTIDUO_EINVOICING_KEY` (64 caractères hexadécimaux, chiffrement des
+   jetons par EINV ; sinon dérivée de `MARTEN_SECRET_KEY`).
+. Dans le dossier : Réglages, SUPER PDP, « Se raccorder avec SUPER PDP »
+  (numéro d'entreprise et schéma `be_numero_entreprise` pré-remplis pour un
+  dossier belge).
 
 == Organisation
 
@@ -130,6 +283,7 @@ src/superpdp/
 ui/bulma/                         # interface Bulma (Superpdp::Ui), ADR-005 D4
 spec/support/superpdp_platform.cr # SUPER PDP simulée
 spec/integration/sandbox_spec.cr  # suite d'intégration contre le bac à sable réel
+spec/integration/oauth_sandbox_essai.cr  # essai manuel de la délégation OAuth (hors suite)
 ----
 
 == Composition dans une distribution
@@ -209,7 +363,8 @@ La suite d'intégration `spec/integration/sandbox_spec.cr` tourne contre le
 existent : `SUPERPDP_SANDBOX_SELLER_CLIENT_ID`,
 `SUPERPDP_SANDBOX_SELLER_CLIENT_SECRET`, `SUPERPDP_SANDBOX_BUYER_CLIENT_ID`,
 `SUPERPDP_SANDBOX_BUYER_CLIENT_SECRET`, dans l'environnement ou dans
-`~/.config/partiduo/superpdp-sandbox.env` (lignes `VAR=valeur`) ;
+`~/.config/partiduo/superpdp-sandbox.env` (lignes `VAR=valeur` ;
+`SUPERPDP_SANDBOX_ENV_FILE` pour un autre fichier) ;
 `SUPERPDP_SANDBOX=off` la désactive. Elle passe par `HTTPS_PROXY` s'il est
 défini. Ces secrets ne sont jamais affichés, journalisés ni versionnés.
 

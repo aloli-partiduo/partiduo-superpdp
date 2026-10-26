@@ -1,0 +1,62 @@
+= partiduo-superpdp — décisions
+:toc: left
+:toc-title: Table des matières
+:icons: font
+
+Décisions prises dans ce dépôt quand un point n'était pas tranché par les
+ADR (contexte, choix, alternatives écartées). Les ADR ne sont jamais
+modifiés : un écart ou un complément y est proposé ici.
+
+La numérotation `D-SPDP-…` continue celle des décisions de l'extension
+consignées dans `../partiduo-app/DECISIONS.adoc` (D-SPDP-001 à
+D-SPDP-014) ; les blocages restent dans `../partiduo-app/BLOCAGES.adoc`
+(`B-SPDP-…`).
+
+== Décisions
+
+=== D-SPDP-015 — Raccordement par délégation OAuth : guide de l'opérateur et essai manuel en bac à sable (26 octobre 2026)
+
+Décision de l'utilisateur du 26 octobre 2026, préalable aux clients belges
+(ADR-004 D8, README « Dossiers belges »). Version 0.1.12. Prépare la levée
+de *B-SPDP-004* (mode _authorization code_ jamais essayé contre SUPER PDP).
+
+*Contexte.* Le mode _authorization code_ (D-SPDP-005) n'est éprouvé que
+contre la plateforme simulée. Il demande une application OAuth de
+l'opérateur, déclarée dans son compte SUPER PDP : un geste sur ce compte,
+fait par l'utilisateur, jamais par Partiduo ni par un agent.
+
+*Choix.*
+
+* *Guide* dans le README (« Raccorder une entreprise par délégation
+  OAuth »), d'après les pages publiques de SUPER PDP (Authentification,
+  Belgique, Démarrage rapide, Annuaire, exemple `erp.go`) : application
+  OAuth bac à sable puis de production, adresse de rappel exacte (route
+  `superpdp:callback`, `/ext/SUPERPDP/oauth/callback`), réglages de
+  l'instance, fichier des identifiants du poste
+  (`~/.config/partiduo/superpdp-sandbox.env`, noms sans valeur),
+  entreprise belge de test (Tricatel avec une ligne d'annuaire `0208`).
+* *Essai manuel* `spec/integration/oauth_sandbox_essai.cr`, hors suite
+  (nom sans `_spec`) : il passe par le contrat de l'instance
+  (`Api.start_authorization`, `Api.complete_authorization`), sert la route
+  de rappel en local (`http://localhost:8765/…`, adresse locale admise par
+  SUPER PDP, comme dans son exemple), lit `GET /companies/me` avec le jeton
+  délégué, puis envoie une facture UBL PEPPOL BIS adressée en `0208` à
+  l'entreprise belge de test, qui la reçoit. Interactif (navigateur) : il
+  n'a pas sa place dans la suite, qui ne doit jamais attendre.
+* *Identifiants* lus par `SpecSupport::SandboxEnv`, commun à la suite
+  d'intégration : environnement, sinon le fichier
+  `SUPERPDP_SANDBOX_ENV_FILE` (par défaut
+  `~/.config/partiduo/superpdp-sandbox.env`). Sans eux, l'essai s'arrête
+  aussitôt, en attente, avec les variables manquantes et l'adresse de
+  rappel à déclarer. Aucune valeur n'est affichée.
+
+*Limite relevée.* SUPER PDP exige une Redirect URL identique à celle de
+l'application. Chaque dossier étant une instance avec son propre hôte, il
+faut déclarer l'adresse de chaque instance raccordée si le formulaire en
+admet plusieurs, sinon une application par instance ;
+`PARTIDUO_SUPERPDP_REDIRECT_URI` ne suffit pas à mutualiser (le `state`
+est tenu par l'instance qui a lancé le parcours). À trancher au premier
+raccordement de production, après l'essai.
+
+*Levée de B-SPDP-004.* Après un essai réussi de l'utilisateur en bac à
+sable, puis un raccordement de production.

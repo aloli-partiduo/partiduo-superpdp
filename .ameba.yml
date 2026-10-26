@@ -17,3 +17,10 @@ Naming/QueryBoolMethods:
 # facultatif ; même réglage qu'EINV (DECISIONS D-EINV-013).
 Metrics/CyclomaticComplexity:
   MaxComplexity: 20
+
+# Essai manuel du raccordement par délégation OAuth (D-SPDP-015) : nom sans
+# `_spec`, pour que `crystal spec` ne le lance jamais (il attend le
+# navigateur de l'utilisateur).
+Lint/SpecFilename:
+  Excluded:
+    - spec/integration/oauth_sandbox_essai.cr
